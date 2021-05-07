@@ -58,7 +58,12 @@ Exit:		xor ax, ax
 ;===============================================================================
 InitPalette	proc
 ;-------------------------------------------------------------------------------
-; TODO
+; Initializes palette in a following way:
+; Values XXXXXXX1 acquire color 1
+; Values XXXXXX10 - color 2
+; ...
+; Value  10000000 - color 8
+; Value  00000000 - color 9
 ;===============================================================================
 		push ax bx cx dx di si
 
@@ -96,7 +101,7 @@ InitPalette	endp
 ;===============================================================================
 SetRandomState	proc
 ;-------------------------------------------------------------------------------
-; TODO
+; Generates random state for the Game of Life using linear congruential method
 ;===============================================================================
 		push ax bx cx dx di
 
@@ -111,10 +116,10 @@ RndLoop:	mul bx		; !Trashes dx
 		cmp ax, RND_FILT
 		jle RndSetDead
 
-RndSetAlive:	mov byte ptr [di-1], 1
+RndSetAlive:	mov byte ptr es:[di-1], 1
 		jmp RndLoopEnd
 
-RndSetDead:	mov byte ptr [di-1], 0
+RndSetDead:	mov byte ptr es:[di-1], 0
 
 RndLoopEnd:	dec di
 		jne RndLoop
@@ -132,7 +137,7 @@ SetPaletteColor	proc
 ;		cl = blue value (00h - 3Fh)
 ;		dh = red value (00h - 3Fh)
 ;-------------------------------------------------------------------------------
-; TODO
+; Sets color for the single color register
 ;===============================================================================
 		push ax
 
@@ -152,7 +157,7 @@ CntNeighbours	proc
 ;
 ; ! TRASHES cl
 ;-------------------------------------------------------------------------------
-; TODO
+; Counts number of alive neighbours for the given cell
 ;===============================================================================
 		; Top-left
 		mov al, es:[bx - COLUMNS - 1]
@@ -206,7 +211,13 @@ NewState	proc
 ;
 ; ! TRASHES cl
 ;-------------------------------------------------------------------------------
-; TODO
+; Calculates new state for the given cell using next algorithm
+;   If cell is alive:
+;     If number of alive neighbours is equal to 2 or 3 -> set alive
+;     Else -> set dead
+;   If cell is dead:
+;     If number of alive neighbours is equalt 3 -> set alive
+;     Else -> set dead
 ;===============================================================================
 		mov cl, ah
 		shl ah, 1
